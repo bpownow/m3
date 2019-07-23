@@ -350,6 +350,11 @@ type databaseNamespace interface {
 		flush persist.FlushPreparer,
 	) error
 
+	// ColdFlushIndex flushes unflushed in-memory indexes of ColdWrites.
+	ColdFlushIndex(
+		flush persist.IndexFlush,
+	) error
+
 	// Snapshot snapshots unflushed in-memory WarmWrites.
 	Snapshot(blockStart, snapshotTime time.Time, flush persist.SnapshotPreparer) error
 
@@ -560,9 +565,16 @@ type namespaceIndex interface {
 	// data eviction, and so on.
 	Tick(c context.Cancellable, startTime time.Time) (namespaceIndexTickResult, error)
 
-	// Flush performs any flushes that the index has outstanding using
+	// WarmFlush performs any warm flushes that the index has outstanding using
 	// the owned shards of the database.
-	Flush(
+	WarmFlush(
+		flush persist.IndexFlush,
+		shards []databaseShard,
+	) error
+
+	// ColdFlush performs any cold flushes that the index has outstanding using
+	// the owned shards of the database.
+	ColdFlush(
 		flush persist.IndexFlush,
 		shards []databaseShard,
 	) error
