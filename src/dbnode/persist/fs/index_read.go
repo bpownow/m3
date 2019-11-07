@@ -248,6 +248,12 @@ func (r *indexReader) ReadSegmentFileSet() (
 			segmentFileType: segFileType,
 			digest:          digest.Checksum(bytes),
 		})
+
+		// NB(bodu): Free mmaped bytes after we take the checksum so we don't get memory spikes at bootstrap time.
+		if err := mmap.Free(bytes); err != nil {
+			closeFiles()
+			return nil, err
+		}
 	}
 
 	r.currIdx++

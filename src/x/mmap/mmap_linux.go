@@ -111,6 +111,8 @@ func Munmap(b []byte) error {
 }
 
 // Free mmapped memory.
+// `MADV_DONTNEED` informs the kernel to free the mmapped pages right away instead
+// of waiting for memory pressure.
 func Free(b []byte) error {
 	return syscall.Madvise(b, syscall.MADV_DONTNEED)
 }
